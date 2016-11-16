@@ -1,0 +1,10 @@
+------------------------------------------
+//sets - list of lists, or list of tuples, each representing a set
+//nr - iterator over the sets list
+//pair - current pair we are building from the elements in set - tuple
+CARTESIAN_P(sets,nr,pair)
+	if nr = length(sets)
+		PRINT pair
+	else
+		FOR i <-  0 to length[sets[nr]]
+			CARTESIAN_P(sets, nr+1, pair + (sets[nr][i]))
