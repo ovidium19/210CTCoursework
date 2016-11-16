@@ -1,0 +1,29 @@
+#--------------------------------------------------------------------------
+MAKE_TOWER(cubes,tower,index)
+//This function only works if the cubes are sorted in descending order based on their length
+	//base case
+	IF index = length[cubes]
+		GLOBAL maxTower
+		IF length[tower] > length[maxTower]
+			maxTower <- tower.copy
+		RETURN NONE
+
+	newIndex <- index
+	WHILE newIndex < length[cubes] AND cubes[newIndex].length = cubes[index].length
+		INCREMENT newIndex
+
+    //if no elements in the tower, we add one from the cubes with the biggest length
+	IF length[tower] = 0
+		FOR k <-index to newIndex-1
+			MAKE_TOWER(cubes, tower + [cubes[k]], newIndex)
+	ELSE
+		//we try to add one from the set of cubes we are on now (between index and newIndex)
+		added <- FALSE
+		FOR k <- index to newIndex-1
+			if cubes[k].color ≠ tower[ length[tower] - 1].color
+				added <- True
+				MAKE_TOWER(cubes, tower + [cubes[k]], newIndex)
+		
+		//if none can be added, we go to the next group		
+		if !(added):
+			MAKE_TOWER (cubes, tower, newIndex)
