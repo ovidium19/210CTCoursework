@@ -1,0 +1,6 @@
+Implement the structure for an unweighted, undirected graph G, where nodes consist of positive
+integers. Also, implement a function isPath(v, w), where v and w are vertices in the graph, to check if
+there is a path between the two nodes. The path found will be printed to a text file as a sequence of
+integer numbers (the node values). 13. Using the graph structure previously implemented, implement
+a function isConnected(G) to check whether or not the graph is strongly connected. The output should
+be simply 'yes' or 'no‘.
