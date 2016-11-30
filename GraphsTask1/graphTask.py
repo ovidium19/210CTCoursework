@@ -1,42 +1,20 @@
-class Node():
-    def __init__(self,value):
-        self.value=value
-        self.next=None
-        
-class Queue():
-    #a LinkedList that simulates a queue..used for bfsTraversal
-    def __init__(self,head=None,tail=None):
-        self.head=head
-        self.tail=tail
-    def push(self,node):
-        if self.head==None:
-            self.head=self.tail=node
-            node.next=None
-        else:
-            self.tail.next=node
-            node.next=None
-            self.tail=node
-        return None
-        
-    def pop(self):
-        if self.head==None:
-            return None
-        else:
-            buffer=self.head.next
-            self.head.next=None
-            val=self.head.value
-            self.head=buffer
-            
-        return val
-
-    def isEmpty(self):
-        if self.head==None:
-            return True
-        else:
-            return False
+def binarySearch(seq,val,start,end):
+    #used to quickly search through the vertices in the graph and
+    #in the neighbour arrays to look for the pointer to the vertex that
+    #holds value val
     
+    #returns the index of that pointer in the array
+    #returns -1 when it fails to find
+    mid=int((start+end)/2)
+    if start>end:
+        return -1
+    if val==seq[mid]:
+        return seq[mid]
+    elif val<seq[mid]:
+        return binarySearch(seq,val,start,mid-1)
+    else:
+        return binarySearch(seq,val,mid+1,end)
 
-    
 class Stack():
     #regular stack used by dfsTraversal
     def __init__(self):
@@ -54,153 +32,242 @@ class Stack():
         
         return val
 
-    def empty(self):
+    def isEmpty(self):
         if self.__top==-1:
             return True
         else:
             return False
     def top(self):
         return self.__stack[self.__top]
+
     
-class Graph():
-    '''Building a graph data structure, whose vertices represent integer
-       numbers.
 
-        vertexInsert - insert a vertex in the graph. Must be an integer
 
-        edgeInsert((a,b)) - inserts an edge between integer values a and b
-
-        __str__ - displays the graph as an adjacency list
-
-        dfsTraversal(v,w=None) - Performs a depth first traversal on the graph
-                                 and returns a list with all the vertices visitedd
-                                 starting with v.
-                                 If w is given, the dfsTraversal will stop once
-                                 w is reached
-
-        isConnected() - Prints 'yes' or 'no if the graph is strongly connected
-
-        isPath(v,w)  - Prints to 'isPath.txt' wethere there is a path between
-                       vertices v and w in the graph. If a path is found, it will be
-                       printed in the file.'''
-    def __init__(self):
-        self.adjList={}
-        self.vertices=[] #holding the vertices in ascending order
+class Queue():
+    class Node():
+        #elements of the queue
+        def __init__(self,value):
+            self.value=value
+            self.next=None
+    #a LinkedList that simulates a queue..used for bfsTraversal
+    #queue - because it is more efficient to remove items from the front
+    def __init__(self,head=None,tail=None):
+        self.head=head
+        self.tail=tail
+    def enqueue(self,node):
+        node=self.Node(node)
+        if self.head==None:
+            self.head=self.tail=node
+            node.next=None
+        else:
+            self.tail.next=node
+            node.next=None
+            self.tail=node
+        return None
         
-    def vertexInsert(self,val):
-        #if the val is integer and not in the graph already, then a key is created with that val
-        #the val is also added in the vertices list, vertices list will always be sorted asccending
-        if val not in self.adjList.keys():
-            if type(val) == int:
-                self.adjList[val]=[]
-                if len(self.vertices)==0:
-                    self.vertices.append(val)
-                else:
-                    added=False
-                    for i in range(len(self.vertices)):
-                        if self.vertices[i]>=val:
-                            self.vertices=self.vertices[:i]+[val]+self.vertices[i:]
-                            added=True
-                            break
-                    if not added:
-                        self.vertices.append(val)
+    def dequeue(self):
+        if self.head==None:
+            return None
+        else:
+            buffer=self.head.next
+            self.head.next=None
+            val=self.head.value
+            self.head=buffer
+            
+        return val
+
+    def isEmpty(self):
+        if self.head==None:
+            return True
+        else:
+            return False
+
+    
+
+
+
+
+class Graph():
+    class Vertex():
+        #the vertex class that represents a node in the graph
+        #holds the data in the node and the neighbours of that node
+        def __init__(self,val):
+            self.data=val
+            self.neighbours=[]
+
+        def __eq__(self,val):
+            return self.data==val
+        def __lt__(self,val):
+            return self.data<val
+        def __le__(self,val):
+            return self.data<=val
+        def __gt__(self,val):
+            return self.data>val
+        def __ge__(self,val):
+            return self.data>=val
+            
+        def addNeighbour(self,v):
+            #adding neighbours will be done in order
+            if self.neighbours==[]:
+                self.neighbours.append(v)
+                if self not in v.neighbours:
+                    v.addNeighbour(self)
+                return True
             else:
-                return False
-        return True
-    
-    def edgeInsert(self,edge):
-        #the parameter is a tuple
-        #error checking, if both elements are equal or any of them is not a vertex, return False
-        #if not, the adjacency list is updated to include the new edge
-        i,j=edge
-        if i==j:
+                added=False
+                for i in range(len(self.neighbours)):
+                    if self.neighbours[i]>=v:
+                        self.neighbours=self.neighbours[:i]+[v]+self.neighbours[i:]
+                        added=True
+                        break
+                if not added:
+                    self.neighbours.append(v)
+                if self not in v.neighbours:
+                    #because the graph is undirected, we have to add the head in the tail's
+                    #neighbour list as well
+                    v.addNeighbour(self)
+                return True
+        
+    def __init__(self):
+        #the graph only holds the list of vertices
+        self.vertices=[]
+
+    def findVertex(self,val):
+        #finds the pointer to the vertex that holds the value val(calls binarySearch)
+        if isinstance(val,self.Vertex):
+            val=val.data
+        if self.vertices==[]:
             return False
-        if i not in self.adjList.keys() or j not in self.adjList.keys():
+        else:
+            return binarySearch(self.vertices,val,0,len(self.vertices)-1)
+
+    def addVertex(self,v):
+        #adds a vertex to the list of vertices. It is done in order
+        v=self.Vertex(v)
+        if self.vertices==[]:
+            self.vertices.append(v)
+            return True
+        else:
+            added=False
+            for i in range(len(self.vertices)):
+                if self.vertices[i]>=v:
+                    self.vertices=self.vertices[:i]+[v]+self.vertices[i:]
+                    added=True
+                    break
+            if not added:
+                self.vertices.append(v)
+            return True
+        
+    def addEdge(self,h,t):
+        #adds an edge from head to tail. It simply calls head's addNeighbour function
+        #the user does not have to input pointers as parameters, can simply do it with values
+        head=self.findVertex(h)
+        tail=self.findVertex(t)
+        if head not in self.vertices or tail not in self.vertices:
             return False
-        elif j not in self.adjList[i]:
-            self.adjList[i]+=[j]
-            self.adjList[j]+=[i]
-        return True
-    
+        else:
+            head.addNeighbour(tail)
+            return True
     def __str__(self):
-        s="Adjacency List: \n"
+        #printing the adjacency list
+        s=''
         for i in self.vertices:
-            s+="%d: "%i +str(sorted(self.adjList[i]))
+            s+=str(i.data)+": "
+            for j in i.neighbours:
+                s+=str(j.data)+" "
             s+="\n"
         return s
-    
-    def dfsTraversal(self,v,w=None):
+
+    def dfsTraversal(self,v):
         #uses a stack
         #will go down a path until the end, then return to where another path can be found
-        if v not in self.adjList.keys():
+        v=self.findVertex(v) 
+        if v not in self.vertices:
             return None
         vis=[]
         s=Stack()
         s.push(v)
-        vis+=[v]
-        while not s.empty():
-            v=s.top()
-            added=False
-            for i in self.adjList[v]:
+        traversal=[]
+        while not s.isEmpty():
+            v=s.pop()
+            traversal+=[v.data]
+            vis+=[v]
+            for i in v.neighbours:
                 if i not in vis:
                     vis+=[i]
-                    if i == w:
-                        return vis
-                    added=True
                     s.push(i)
-                    break
-            if not added:
-                s.pop()
-        return vis
+        return traversal
 
-    def bfsTraversal(self,v,w=None):
+    def bfsTraversal(self,v):
         #uses a queue
         #displays all neighbours of the current node, then iterates over all the children to do the same thing
-        if v not in self.adjList.keys():
+        v=self.findVertex(v) 
+        if v==-1:
             return None
         vis=[]
         q=Queue()
-        q.push(Node(v))
+        q.enqueue(v)
         vis+=[v]
         while not q.isEmpty():
-            v=q.pop()
-            for i in self.adjList[v]:
+            v=q.dequeue()
+            for i in v.neighbours:
                 if i not in vis:
                     vis+=[i]
-                    if i== w:
-                        return vis
-                    q.push(Node(i))
+                    q.enqueue(i)
+        for i in range(len(vis)):
+            #we replace the pointers with the values they hold and return the list to the user(same above if w is given)
+            vis[i]=vis[i].data
         return vis
-        
-            
 
     def isConnected(self):
         #if dfs traversal returns a list of all the vertices of the graph, then the graph is
         #strongly connected
         if len(self.vertices)==0:
             return False
-        vis=self.dfsTraversal(self.vertices[0])
-        if len(vis)==len(self.adjList.keys()):
-            print("yes")
+        vis=self.dfsTraversal(self.vertices[0].data)
+        if len(vis)==len(self.vertices):
+            return "yes"
         else:
-            print("no")
-        
+            return "no"
+
     def isPath(self,v,w):
-        #simply do a dfs traversal strating from v, if w is found in the list, then there is a path
-        #between the two.
-        #the output is displayed in the file ispath.txt
-        file=open("ispath.txt",'a')
+        #similar to dfsTraversal
+        # We go down a path until we find target vertex or its a dead end. Then we return to a previous
+        # vertice where another path might be available
+        file=open("ispath.txt",'w')
         file.write("\nLooking for a path from %d to %d:"%(v,w))
-        vis=self.dfsTraversal(v,w)
-        if w not in vis:
-            file.write(" no path")
+        s=Stack()
+        v=self.findVertex(v)
+        w=self.findVertex(w)
+        if v not in self.vertices or w not in self.vertices:
+            return False
+        s.push(v)
+        vis=[v]
+        found=False
+        while not s.isEmpty() and not found:
+            added=False
+            v=s.top()
+            for i in v.neighbours:  
+                if i not in vis:
+                    if i == w:
+                        found=True
+                    s.push(i)
+                    vis+=[i]
+                    added=True
+                    break
+            if not added:
+                garbage=s.pop()
+        if found:
+            printable=''
+            while not s.isEmpty():
+                printable=str(s.pop().data)+"->"+printable
+            file.write("path: "+printable.strip("->"))
             file.close()
-            return None
         else:
-            file.write( " path: " + str(vis))
+            file.write(" no path ")
             file.close()
-            return None
-        
+        return None
+            
 
 s=input("Read from file or keyboard?\n1.File(graph.txt)\n2.Keyboard\n(write 1 or 2)\n").strip()
 #File graph.txt is used to read from file should you wish to input this way
@@ -214,20 +281,22 @@ s=input("Read from file or keyboard?\n1.File(graph.txt)\n2.Keyboard\n(write 1 or
 #   - Any mistake in the way the input is taken will result in a ValueError or File related Error
 #
 ########################################
+
 g=Graph()
 if s=='1':
     f=open('graph.txt','r')
     vertices=list(map(int,f.readline().strip().split(" ")))
     for i in vertices:
-        g.vertexInsert(i)
+        g.addVertex(i)
     while True:
         line=f.readline()
         if not line:
             break
         i,j=map(int,line.strip().split(","))
-        g.edgeInsert((i,j))
+        g.addEdge(i,j)
     f.close()
 else:
+    #keyboard input. Self-explanatory input prompts
     while True:
         try:
             vertices=list(map(int,input("Enter list of integers separated by space(vertices): ").strip().split(" ")))
@@ -237,27 +306,22 @@ else:
             continue
     print("To enter edges, simply enter a pair of numbers i,j separated by comma. To stop, enter anything else")
     for  i in vertices:
-        g.vertexInsert(i)
-    print(g.vertices)
+        g.addVertex(i)
     while True:
         try:
-            edge=tuple(map(int,input("Enter edge: ").strip().split(",")))
-            g.edgeInsert(edge)
+            i,j=(map(int,input("Enter edge: ").strip().split(",")))
+            g.addEdge(i,j)
             continue
         except ValueError:
             break
-    print(g)
 
-#print(g.dfsTraversal(1))
-#print(g.bfsTraversal(1))
-#print(g)
-#g.isConnected()
-#g.isPath(6,8)
-#g.vertexInsert(0)
-#g.edgeInsert((0,8))
-#print(g)
-#g.isConnected()
-#g.isPath(0,8)
-                  
+print(g.isConnected())
+print("DFS: " + str(g.dfsTraversal(1)))
+print("BFS: " + str(g.bfsTraversal(1)))
+g.isPath(1,8)
+
+
+            
     
-    
+                
+                
